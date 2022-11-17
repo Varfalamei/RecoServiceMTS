@@ -11,6 +11,10 @@ class RecoResponse(BaseModel):
     user_id: int
     items: List[int]
 
+class NotFoundError(BaseModel):
+    error_key: str
+    error_message: str
+    error_loc: Optional[Sequence[str]]        
 
 router = APIRouter()
 
@@ -27,6 +31,7 @@ async def health() -> str:
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
+    responses={404: {"model": NotFoundError, "user": NotFoundError}}
 )
 async def get_reco(
     request: Request,
