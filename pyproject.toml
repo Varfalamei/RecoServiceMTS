@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "reco_service"
-version = "0.0.1"
+version = "0.0.2"
 description = ""
-authors = ["Emiliy Feldman <feldlime@yandex.ru>"]
-maintainers = ["Emiliy Feldman <feldlime@yandex.ru>"]
+authors = ["Shakirov Renat <renatshk@gmail.com>"]
+maintainers = ["Shakirov Renat <renatshk@gmail.com>"]
 readme = "README.md"
 packages = [
     { include = "service" }
