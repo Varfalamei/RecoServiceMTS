@@ -1,11 +1,10 @@
-from fastapi.security import OAuth2PasswordBearer
-from fastapi import APIRouter, FastAPI, Request, HTTPException, status, Depends
-
-from pydantic import BaseModel
-
 from typing import List, Optional, Sequence
 
-from service.api.exceptions import UserNotFoundError, ModelNotFoundError
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
+
+from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
 
 
@@ -13,14 +12,17 @@ class RecoResponse(BaseModel):
     user_id: int
     items: List[int]
 
+
 class NotFoundError(BaseModel):
     error_key: str
     error_message: str
-    error_loc: Optional[Sequence[str]]        
+    error_loc: Optional[Sequence[str]]
+
 
 router = APIRouter()
 SEC_TOKEN = "12345678"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
+
 
 @router.get(
     path="/health",
@@ -51,7 +53,7 @@ async def get_reco(
             headers={"WWW-Authenticate": "Basic"},
         )
 
-    if user_id > 10**9:
+    if user_id > 10 ** 9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
     if model_name != 'model_1':
