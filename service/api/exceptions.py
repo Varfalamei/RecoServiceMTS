@@ -37,3 +37,14 @@ class ModelNotFoundError(AppException):
         error_loc: tp.Optional[tp.Sequence[str]] = None,
     ):
         super().__init__(status_code, error_key, error_message, error_loc)
+
+
+class CredentialError(AppException):
+    def init(
+        self,
+        status_code: int = HTTPStatus.UNAUTHORIZED,
+        error_key: str = "wrong_credentials",
+        error_message: str = "Wrong credentials",
+        error_loc: tp.Optional[tp.Sequence[str]] = None,
+    ):
+        super().__init__(status_code, error_key, error_message, error_loc)

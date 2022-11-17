@@ -1,10 +1,19 @@
 from typing import List, Optional, Sequence
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import APIRouter, Depends, FastAPI, Request, Security
+from fastapi.security.api_key import (
+    APIKey,
+    APIKeyCookie,
+    APIKeyHeader,
+    APIKeyQuery,
+)
 from pydantic import BaseModel
 
-from service.api.exceptions import ModelNotFoundError, UserNotFoundError
+from service.api.exceptions import (
+    CredentialError,
+    ModelNotFoundError,
+    UserNotFoundError,
+)
 from service.log import app_logger
 
 
@@ -20,8 +29,30 @@ class NotFoundError(BaseModel):
 
 
 router = APIRouter()
-SEC_TOKEN = "12345678"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth")
+
+API_KEY = "12345678"
+API_KEY_NAME = "access_token"
+COOKIE_DOMAIN = "localtest.me"
+
+api_key_query = APIKeyQuery(name=API_KEY_NAME, auto_error=False)
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+api_key_cookie = APIKeyCookie(name=API_KEY_NAME, auto_error=False)
+
+
+async def get_api_key(
+    api_key_query: str = Security(api_key_query),
+    api_key_header: str = Security(api_key_header),
+    api_key_cookie: str = Security(api_key_cookie),
+):
+
+    if api_key_query == API_KEY:
+        return api_key_query
+    elif api_key_header == API_KEY:
+        return api_key_header
+    elif api_key_cookie == API_KEY:
+        return api_key_cookie
+    else:
+        raise CredentialError()
 
 
 @router.get(
@@ -36,22 +67,18 @@ async def health() -> str:
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
-    responses={404: {"model": NotFoundError, "user": NotFoundError}}
+    responses={
+        404: {"model": NotFoundError, "user": NotFoundError},
+        401: {'credential': CredentialError}
+    }
 )
 async def get_reco(
     request: Request,
     model_name: str,
     user_id: int,
-    token: str = Depends(oauth2_scheme)
+    api_key: APIKey = Depends(get_api_key)
 ) -> RecoResponse:
     app_logger.info(f"Request for model: {model_name}, user_id: {user_id}")
-
-    if token != SEC_TOKEN:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect token",
-            headers={"WWW-Authenticate": "Basic"},
-        )
 
     if user_id > 10 ** 9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
