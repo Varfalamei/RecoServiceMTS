@@ -42,9 +42,9 @@ class ModelNotFoundError(AppException):
 class CredentialError(AppException):
     def init(
         self,
-        status_code: int = HTTPStatus.UNAUTHORIZED,
+        status_code: int = HTTPStatus.FORBIDDEN,
         error_key: str = "wrong_credentials",
-        error_message: str = "Wrong credentials",
+        error_message: str = "Could not validate API KEY",
         error_loc: tp.Optional[tp.Sequence[str]] = None,
     ):
         super().__init__(status_code, error_key, error_message, error_loc)
