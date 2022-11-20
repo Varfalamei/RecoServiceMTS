@@ -24,11 +24,6 @@ class NotFoundError(BaseModel):
     error_message: str
     error_loc: Optional[Sequence[str]]        
 
-class NotFoundError(BaseModel):
-    error_key: str
-    error_message: str
-    error_loc: Optional[Sequence[str]]
-
 
 router = APIRouter()
 
