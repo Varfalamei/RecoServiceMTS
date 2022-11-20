@@ -19,6 +19,10 @@ class RecoResponse(BaseModel):
     user_id: int
     items: List[int]
 
+class NotFoundError(BaseModel):
+    error_key: str
+    error_message: str
+    error_loc: Optional[Sequence[str]]        
 
 class NotFoundError(BaseModel):
     error_key: str
