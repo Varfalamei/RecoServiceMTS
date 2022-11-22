@@ -22,7 +22,12 @@ class RecoResponse(BaseModel):
 class NotFoundError(BaseModel):
     error_key: str
     error_message: str
-    error_loc: Optional[Sequence[str]]        
+    error_loc: Optional[Sequence[str]]
+        
+class UnauthorizedError(BaseModel):
+    error_key: str
+    error_message: str
+    error_loc: Optional[Sequence[str]]
 
 
 router = APIRouter()
@@ -50,8 +55,7 @@ async def get_api_key(
 
 @router.get(
     path="/health",
-    tags=["Health"],
-    responses={404: {"model": NotFoundError, "user": NotFoundError}},
+    tags=["Health"]
 )
 async def health(api_key: APIKey = Depends(get_api_key)) -> str:
     return "I am alive"
@@ -61,7 +65,8 @@ async def health(api_key: APIKey = Depends(get_api_key)) -> str:
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
-    responses={404: {"model": NotFoundError, "user": NotFoundError}, },
+    responses={404: {"model": NotFoundError, "user": NotFoundError}, 
+               401: {"model": UnauthorizedError}},
 )
 async def get_reco(
     request: Request,
