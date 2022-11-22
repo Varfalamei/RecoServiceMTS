@@ -29,7 +29,7 @@ class UserNotFoundError(AppException):
 
 
 class ModelNotFoundError(AppException):
-    def init(
+    def __init__(
         self,
         status_code: int = HTTPStatus.NOT_FOUND,
         error_key: str = "model_not_found",
@@ -40,7 +40,7 @@ class ModelNotFoundError(AppException):
 
 
 class CredentialError(AppException):
-    def init(
+    def __init__(
         self,
         status_code: int = HTTPStatus.FORBIDDEN,
         error_key: str = "wrong_credentials",

@@ -19,11 +19,13 @@ class RecoResponse(BaseModel):
     user_id: int
     items: List[int]
 
+
 class NotFoundError(BaseModel):
     error_key: str
     error_message: str = 'NotFound'
     error_loc: Optional[Sequence[str]]
-        
+
+
 class UnauthorizedError(BaseModel):
     error_key: str
     error_message: str = 'Unauthorized'
@@ -40,7 +42,7 @@ token_bearer = HTTPBearer(auto_error=False)
 
 async def get_api_key(
     api_key_query: str = Security(api_key_query),
-    api_key_header: str = Security(api_key_header),
+    api_key_header: str = Security(api_key_header, ),
     token: HTTPAuthorizationCredentials = Security(token_bearer),
 ):
     if api_key_query == config_env["API_KEY"]:
@@ -50,7 +52,7 @@ async def get_api_key(
     elif token is not None and token.credentials == config_env["API_KEY"]:
         return token.credentials
     else:
-        raise CredentialError
+        raise CredentialError()
 
 
 @router.get(
@@ -65,7 +67,7 @@ async def health(api_key: APIKey = Depends(get_api_key)) -> str:
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
-    responses={404: {"model": NotFoundError, "user": NotFoundError}, 
+    responses={404: {"model": NotFoundError, "user": NotFoundError},
                401: {"model": UnauthorizedError}},
 )
 async def get_reco(
