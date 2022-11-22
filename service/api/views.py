@@ -21,12 +21,12 @@ class RecoResponse(BaseModel):
 
 class NotFoundError(BaseModel):
     error_key: str
-    error_message: str
+    error_message: str = 'NotFound'
     error_loc: Optional[Sequence[str]]
         
 class UnauthorizedError(BaseModel):
     error_key: str
-    error_message: str
+    error_message: str = 'Unauthorized'
     error_loc: Optional[Sequence[str]]
 
 
