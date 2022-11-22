@@ -2,8 +2,8 @@ from http import HTTPStatus
 
 from starlette.testclient import TestClient
 
-from service.settings import ServiceConfig
 from service.api.config import config_env
+from service.settings import ServiceConfig
 
 GET_RECO_PATH = "/reco/{model_name}/{user_id}"
 headers = {config_env['API_KEY_NAME']: config_env["API_KEY"]}
