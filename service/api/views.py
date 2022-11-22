@@ -34,15 +34,14 @@ class UnauthorizedError(BaseModel):
 
 router = APIRouter()
 
-api_key_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
-api_key_header = APIKeyHeader(name=config_env["API_KEY_NAME"],
-                              auto_error=False)
+api_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
+api_header = APIKeyHeader(name=config_env["API_KEY_NAME"], auto_error=False)
 token_bearer = HTTPBearer(auto_error=False)
 
 
 async def get_api_key(
-    api_key_query: str = Security(api_key_query),
-    api_key_header: str = Security(api_key_header, ),
+    api_key_query: str = Security(api_query),
+    api_key_header: str = Security(api_header),
     token: HTTPAuthorizationCredentials = Security(token_bearer),
 ):
     if api_key_query == config_env["API_KEY"]:
@@ -51,8 +50,7 @@ async def get_api_key(
         return api_key_header
     elif token is not None and token.credentials == config_env["API_KEY"]:
         return token.credentials
-    else:
-        raise CredentialError()
+    raise CredentialError()
 
 
 @router.get(
