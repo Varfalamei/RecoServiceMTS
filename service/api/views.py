@@ -11,7 +11,7 @@ from service.log import app_logger
 
 from .config import config_env
 from .models import NotFoundError, RecoResponse, UnauthorizedError
-from .models_zoo import DumpModel
+from .models_zoo import DumpModel, TopPopularAllCovered
 
 router = APIRouter()
 
@@ -19,7 +19,10 @@ api_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
 api_header = APIKeyHeader(name=config_env["API_KEY_NAME"], auto_error=False)
 token_bearer = HTTPBearer(auto_error=False)
 
-models_zoo = {"model_1": DumpModel()}
+models_zoo = {
+    "model_1": DumpModel(),
+    "TopPopularAllCovered": TopPopularAllCovered(),
+}
 
 
 async def get_api_key(
