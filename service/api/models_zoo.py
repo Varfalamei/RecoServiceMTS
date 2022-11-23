@@ -2,7 +2,7 @@ from abc import ABC
 from typing import List
 
 
-class BaseModel(ABC):
+class BaseModelZoo(ABC):
     def __init__(self):
         pass
 
@@ -19,7 +19,7 @@ class BaseModel(ABC):
         """
 
 
-class DumpModel(BaseModel):
+class DumpModel(BaseModelZoo):
     def reco_predict(
         self,
         user_id: int,
