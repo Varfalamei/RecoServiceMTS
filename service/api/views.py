@@ -85,7 +85,10 @@ async def get_reco(
     if model_name not in models_zoo.keys():
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
     else:
-        reco = models_zoo[model_name].reco_predict(user_id=user_id, k_recs=k_recs)
+        reco = models_zoo[model_name].reco_predict(
+            user_id=user_id,
+            k_recs=k_recs
+        )
 
     return RecoResponse(user_id=user_id, items=reco)
 
