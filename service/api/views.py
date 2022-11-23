@@ -13,6 +13,7 @@ from service.api.exceptions import (
 from service.log import app_logger
 
 from .config import config_env
+from .models_zoo import DumpModel
 
 
 class RecoResponse(BaseModel):
@@ -22,13 +23,13 @@ class RecoResponse(BaseModel):
 
 class NotFoundError(BaseModel):
     error_key: str
-    error_message: str = 'NotFound'
+    error_message: str = "NotFound"
     error_loc: Optional[Sequence[str]]
 
 
 class UnauthorizedError(BaseModel):
     error_key: str
-    error_message: str = 'Unauthorized'
+    error_message: str = "Unauthorized"
     error_loc: Optional[Sequence[str]]
 
 
@@ -37,6 +38,7 @@ router = APIRouter()
 api_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
 api_header = APIKeyHeader(name=config_env["API_KEY_NAME"], auto_error=False)
 token_bearer = HTTPBearer(auto_error=False)
+models_zoo = {"model_1": DumpModel()}
 
 
 async def get_api_key(
@@ -53,10 +55,7 @@ async def get_api_key(
     raise CredentialError()
 
 
-@router.get(
-    path="/health",
-    tags=["Health"]
-)
+@router.get(path="/health", tags=["Health"])
 async def health(api_key: APIKey = Depends(get_api_key)) -> str:
     return "I am alive"
 
@@ -65,8 +64,10 @@ async def health(api_key: APIKey = Depends(get_api_key)) -> str:
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
-    responses={404: {"model": NotFoundError, "user": NotFoundError},
-               401: {"model": UnauthorizedError}},
+    responses={
+        404: {"model": NotFoundError, "user": NotFoundError},
+        401: {"model": UnauthorizedError},
+    },
 )
 async def get_reco(
     request: Request,
@@ -79,11 +80,13 @@ async def get_reco(
     if user_id > 10 ** 9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
-    if model_name != "model_1":
-        raise ModelNotFoundError(error_message=f"Model {model_name} not found")
-
     k_recs = request.app.state.k_recs
-    reco = list(range(k_recs))
+
+    if model_name not in models_zoo.keys():
+        raise ModelNotFoundError(error_message=f"Model {model_name} not found")
+    else:
+        reco = models_zoo[model_name].reco_predict(user_id=user_id, k_recs=k_recs)
+
     return RecoResponse(user_id=user_id, items=reco)
 
 

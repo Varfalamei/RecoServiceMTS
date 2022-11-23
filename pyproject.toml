@@ -2,8 +2,16 @@
 name = "reco_service"
 version = "0.0.2"
 description = ""
-authors = ["Shakirov Renat <renatshk@gmail.com>"]
-maintainers = ["Shakirov Renat <renatshk@gmail.com>"]
+authors = [
+    "Shakirov Renat <renatshk@gmail.com>",
+    "Mostovik Vladislav <mostovik71@gmail.com>",
+    "Zaraev Robert <robert.zaraev@mail.ru>"
+]
+maintainers = [
+    "Shakirov Renat <renatshk@gmail.com>",
+    "Mostovik Vladislav <mostovik71@gmail.com>",
+    "Zaraev Robert <robert.zaraev@mail.ru>"
+]
 readme = "README.md"
 packages = [
     { include = "service" }
