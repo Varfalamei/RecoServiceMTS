@@ -48,9 +48,9 @@ async def get_api_key(
 ):
     if api_key_query == config_env["API_KEY"]:
         return api_key_query
-    elif api_key_header == config_env["API_KEY"]:
+    if api_key_header == config_env["API_KEY"]:
         return api_key_header
-    elif token is not None and token.credentials == config_env["API_KEY"]:
+    if token is not None and token.credentials == config_env["API_KEY"]:
         return token.credentials
     raise CredentialError()
 
@@ -80,15 +80,15 @@ async def get_reco(
     if user_id > 10 ** 9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
-    k_recs = request.app.state.k_recs
-
     if model_name not in models_zoo.keys():
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
-    else:
-        reco = models_zoo[model_name].reco_predict(
-            user_id=user_id,
-            k_recs=k_recs
-        )
+
+    k_recs = request.app.state.k_recs
+
+    reco = models_zoo[model_name].reco_predict(
+        user_id=user_id,
+        k_recs=k_recs
+    )
 
     return RecoResponse(user_id=user_id, items=reco)
 

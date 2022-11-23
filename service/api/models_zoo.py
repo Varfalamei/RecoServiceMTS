@@ -17,14 +17,9 @@ class BaseModel(ABC):
         :param k_recs: how many recs do you need
         :return: list of recommendation ids
         """
-        pass
 
 
 class DumpModel(BaseModel):
-    def __init__(self):
-        super().__init__()
-        pass
-
     def reco_predict(
         self,
         user_id: int,
