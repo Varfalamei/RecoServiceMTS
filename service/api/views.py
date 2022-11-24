@@ -11,7 +11,13 @@ from service.log import app_logger
 
 from .config import config_env
 from .models import NotFoundError, RecoResponse, UnauthorizedError
-from .models_zoo import DumpModel, TopPopularAllCovered, Popular
+from .models_zoo import (
+    DumpModel,
+    ItemKNN,
+    Popular,
+    TopPopularAllCovered,
+    UserKnnTfIdfTop,
+)
 
 router = APIRouter()
 
@@ -22,7 +28,9 @@ token_bearer = HTTPBearer(auto_error=False)
 models_zoo = {
     "model_1": DumpModel(),
     "TopPopularAllCovered": TopPopularAllCovered(),
-    "modelpopular": Popular()
+    "modelpopular": Popular(),
+    "UserKnnTfIdfTop": UserKnnTfIdfTop(),
+    "ItemKNN": ItemKNN(),
 }
 
 
