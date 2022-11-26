@@ -17,6 +17,7 @@ from .models_zoo import (
     Popular,
     TopPopularAllCovered,
     UserKnnTfIdfTop,
+    BlendingKNN
 )
 
 router = APIRouter()
@@ -31,6 +32,7 @@ models_zoo = {
     "modelpopular": Popular(),
     "UserKnnTfIdfTop": UserKnnTfIdfTop(),
     "ItemKNN": ItemKNN(),
+    "BlendingKNN": BlendingKNN()
 }
 
 
