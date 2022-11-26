@@ -84,7 +84,7 @@ class KNNModelWithTop(BaseModelZoo):
         self,
         path_to_reco: str = "data/BlendingKNNWithAddFeatures.csv.gz"
     ):
-        super(KNNModelWithTop).__init__()
+        super().__init__()
         self.path_to_reco = path_to_reco
         if self.path_to_reco.endswith('csv.gz'):
             self.data = pd.read_csv(path_to_reco, compression='gzip')

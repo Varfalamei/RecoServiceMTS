@@ -13,9 +13,9 @@ from .config import config_env
 from .models import NotFoundError, RecoResponse, UnauthorizedError
 from .models_zoo import (
     DumpModel,
+    KNNModelWithTop,
     Popular,
     TopPopularAllCovered,
-    KNNModelWithTop
 )
 
 router = APIRouter()
