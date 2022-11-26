@@ -13,11 +13,9 @@ from .config import config_env
 from .models import NotFoundError, RecoResponse, UnauthorizedError
 from .models_zoo import (
     DumpModel,
-    ItemKNN,
     Popular,
     TopPopularAllCovered,
-    UserKnnTfIdfTop,
-    BlendingKNN
+    KNNModelWithTop
 )
 
 router = APIRouter()
@@ -30,9 +28,21 @@ models_zoo = {
     "model_1": DumpModel(),
     "TopPopularAllCovered": TopPopularAllCovered(),
     "modelpopular": Popular(),
-    "UserKnnTfIdfTop": UserKnnTfIdfTop(),
-    "ItemKNN": ItemKNN(),
-    "BlendingKNN": BlendingKNN()
+    "UserKnnTfIdfTop": KNNModelWithTop(
+        path_to_reco="data/UserKnnTfIdf.csv"
+    ),
+    "ItemKNN": KNNModelWithTop(
+        path_to_reco="data/ItemKNN.csv"
+    ),
+    "BlendingKNN": KNNModelWithTop(
+        path_to_reco="data/BlendingKNN.csv.gz"
+    ),
+    "BlendingKNNWithAddFeatures": KNNModelWithTop(
+        path_to_reco="data/BlendingKNNWithAddFeatures.csv.gz"
+    ),
+    "KNNBM25withAddFeatures": KNNModelWithTop(
+        path_to_reco="data/KNNBM25withAddFeatures.csv.gz"
+    )
 }
 
 

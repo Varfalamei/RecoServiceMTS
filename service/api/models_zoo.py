@@ -10,8 +10,6 @@ class BaseModelZoo(ABC):
 
     @staticmethod
     def unique(items: List[int]) -> List[int]:
-        # seen = set()
-        # return [item for item in items if not (item in seen or seen.add(item))]
         seen: Set[int] = set()
         seen_add = seen.add
         return [item for item in items if not (item in seen or seen_add(item))]
@@ -81,78 +79,17 @@ class Popular(BaseModelZoo):
         return reco
 
 
-class UserKnnTfIdfTop(BaseModelZoo):
-    def __init__(self):
-        super(UserKnnTfIdfTop).__init__()
-        self.data = pd.read_csv('data/UserKnnTfIdf.csv')
-        self.top_reco = [
-            10440, 15297, 9728, 13865, 4151,
-            3734, 2657, 4880, 142, 6809
-        ]
-
-    def reco_predict(
+class KNNModelWithTop(BaseModelZoo):
+    def __init__(
         self,
-        user_id: int,
-        k_recs: int
-    ) -> List[int]:
-        """
-        Main function for recommendation items to users
-        :param user_id: user identification
-        :param k_recs: how many recs do you need
-        :return: list of recommendation ids
-        """
-        reco = (
-            self.data[self.data.user_id == user_id]
-            .item_id
-            .tolist()
-            [:k_recs]
-        )
-
-        if len(reco) < k_recs:
-            reco.extend(self.top_reco)
-            reco = self.unique(reco)[:k_recs]  # Удаляем дубли
-
-        return reco
-
-
-class ItemKNN(BaseModelZoo):
-    def __init__(self):
-        super(ItemKNN).__init__()
-        self.data = pd.read_csv('data/ItemKNN.csv')
-        self.top_reco = [
-            10440, 15297, 9728, 13865, 4151,
-            3734, 2657, 4880, 142, 6809
-        ]
-
-    def reco_predict(
-        self,
-        user_id: int,
-        k_recs: int
-    ) -> List[int]:
-        """
-        Main function for recommendation items to users
-        :param user_id: user identification
-        :param k_recs: how many recs do you need
-        :return: list of recommendation ids
-        """
-        reco = (
-            self.data[self.data.user_id == user_id]
-            .item_id
-            .tolist()
-            [:k_recs]
-        )
-
-        if len(reco) < k_recs:
-            reco.extend(self.top_reco)
-            reco = self.unique(reco)[:k_recs]  # Удаляем дубли
-
-        return reco
-
-
-class BlendingKNN(BaseModelZoo):
-    def __init__(self):
-        super(BlendingKNN).__init__()
-        self.data = pd.read_csv('data/BlendingKNN.csv')
+        path_to_reco: str = "data/BlendingKNNWithAddFeatures.csv.gz"
+    ):
+        super(KNNModelWithTop).__init__()
+        self.path_to_reco = path_to_reco
+        if self.path_to_reco.endswith('csv.gz'):
+            self.data = pd.read_csv(path_to_reco, compression='gzip')
+        elif self.path_to_reco.endswith('.csv'):
+            self.data = pd.read_csv(path_to_reco)
         self.top_reco = [
             10440, 15297, 9728, 13865, 3734, 12192, 4151, 11863, 7793, 7829
         ]
