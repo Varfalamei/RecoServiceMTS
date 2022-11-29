@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List, Set
 
 import pandas as pd
@@ -14,6 +14,7 @@ class BaseModelZoo(ABC):
         seen_add = seen.add
         return [item for item in items if not (item in seen or seen_add(item))]
 
+    @abstractmethod
     def reco_predict(
         self,
         user_id: int,
@@ -90,6 +91,46 @@ class KNNModelWithTop(BaseModelZoo):
             self.data = pd.read_csv(path_to_reco, compression='gzip')
         elif self.path_to_reco.endswith('.csv'):
             self.data = pd.read_csv(path_to_reco)
+        self.top_reco = [
+            10440, 15297, 9728, 13865, 3734, 12192, 4151, 11863, 7793, 7829
+        ]
+
+    def reco_predict(
+        self,
+        user_id: int,
+        k_recs: int
+    ) -> List[int]:
+        """
+        Main function for recommendation items to users
+        :param user_id: user identification
+        :param k_recs: how many recs do you need
+        :return: list of recommendation ids
+        """
+        reco = (
+            self.data[self.data.user_id == user_id]
+            .item_id
+            .tolist()
+            [:k_recs]
+        )
+
+        if len(reco) < k_recs:
+            reco.extend(self.top_reco)
+            reco = self.unique(reco)[:k_recs]  # Удаляем дубли
+
+        return reco
+
+
+class KNNModelWithTopNearline(BaseModelZoo):
+    def __init__(
+        self,
+        path_to_reco: str = "data/BlendingKNNWithAddFeatures.csv.gz",
+        model_path: str = '',  # path to model knn + bm25
+        dataset_path: str = ''  # interactions
+    ):
+        super().__init__()
+        self.model = ''
+        self.dataset = ''
+
         self.top_reco = [
             10440, 15297, 9728, 13865, 3734, 12192, 4151, 11863, 7793, 7829
         ]
