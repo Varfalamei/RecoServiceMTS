@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Set, Optional
+from collections import defaultdict
+from typing import Dict, List, Set
 
 import dill
 import numpy as np
@@ -61,10 +62,10 @@ class TopPopularAllCovered(BaseModelZoo):
         :return: list of recommendation ids
         """
         reco = [
-            10440, 15297, 9728, 13865, 2657,
-            4151, 3734, 6809, 4740, 4880, 7571,
-            11237, 8636, 14741
-        ][:k_recs]
+                   10440, 15297, 9728, 13865, 2657,
+                   4151, 3734, 6809, 4740, 4880, 7571,
+                   11237, 8636, 14741
+               ][:k_recs]
         return reco
 
 
@@ -175,22 +176,28 @@ class UserKNN:
     ):
         self.n_neighbors = n_neighbors
         self.dist_model = dist_model
-        self.is_fitted = False
         self.verbose = verbose
+        self.is_fitted = False
 
-        self.users_inv_mapping: Optional[Dict[int, int]] = None
-        self.users_mapping: Optional[Dict[int, int]] = None
-        self.items_inv_mapping: Optional[Dict[int, int]] = None
-        self.items_mapping: Optional[Dict[int, int]] = None
+        self.mapping: Dict[str, Dict[int, int]] = defaultdict(dict)
+
         self.weights_matrix = None
         self.users_watched = None
 
     def get_mappings(self, train):
-        self.users_inv_mapping = dict(enumerate(train['user_id'].unique()))
-        self.users_mapping = {v: k for k, v in self.users_inv_mapping.items()}
+        self.mapping['users_inv_mapping'] = dict(
+            enumerate(train['user_id'].unique())
+        )
+        self.mapping['users_mapping'] = {
+            v: k for k, v in self.mapping['users_inv_mapping'].items()
+        }
 
-        self.items_inv_mapping = dict(enumerate(train['item_id'].unique()))
-        self.items_mapping = {v: k for k, v in self.items_inv_mapping.items()}
+        self.mapping['items_inv_mapping'] = dict(
+            enumerate(train['item_id'].unique())
+        )
+        self.mapping['items_mapping'] = {
+            v: k for k, v in self.mapping['items_inv_mapping'].items()
+        }
 
     def get_matrix(
         self, df: pd.DataFrame,
@@ -203,13 +210,17 @@ class UserKNN:
         else:
             weights = np.ones(len(df), dtype=np.float32)
 
-        interaction_matrix = sp.sparse.coo_matrix((
-            weights,
-            (
-                df[user_col].map(self.users_mapping.get),
-                df[item_col].map(self.items_mapping.get)
-            )
-        ))
+        if hasattr(self.mapping['users_mapping'], 'get') and \
+                hasattr(self.mapping['items_mapping'], 'get'):
+            interaction_matrix = sp.sparse.coo_matrix((
+                weights,
+                (
+                    df[user_col].map(self.mapping['users_mapping'].get),
+                    df[item_col].map(self.mapping['items_mapping'].get)
+                )
+            ))
+        else:
+            raise AttributeError
 
         self.users_watched = df.groupby(user_col).agg({item_col: list})
         return interaction_matrix
@@ -238,6 +249,7 @@ class UserKNN:
                 [user_inv_mapping[user] for user, _ in zip(*recs)],
                 [sim for _, sim in zip(*recs)]
             )
+
         return _recs_mapper
 
     def predict(self, user_id: int, n_recs: int = 10):
@@ -247,8 +259,8 @@ class UserKNN:
 
         mapper = self._generate_recs_mapper(
             model=self.dist_model,
-            user_mapping=self.users_mapping,
-            user_inv_mapping=self.users_inv_mapping,
+            user_mapping=self.mapping['users_mapping'],
+            user_inv_mapping=self.mapping['users_inv_mapping'],
             n_neighbors=self.n_neighbors
         )
 
@@ -258,7 +270,7 @@ class UserKNN:
             recs['sim_user_id'], recs['sim'] = zip(
                 *recs['user_id'].map(mapper)
             )
-        except BaseException:
+        except AttributeError:
             return []
 
         recs = recs.set_index('user_id').apply(pd.Series.explode).reset_index()

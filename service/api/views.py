@@ -13,12 +13,12 @@ from .config import config_env
 from .models import NotFoundError, RecoResponse, UnauthorizedError
 from .models_zoo import (
     DumpModel,
+    KNNModelBM25,
     KNNModelWithTop,
     Popular,
     TopPopularAllCovered,
-    KNNModelBM25
 )
-import pandas as pd
+
 router = APIRouter()
 
 api_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
