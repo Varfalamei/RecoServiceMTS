@@ -16,8 +16,9 @@ from .models_zoo import (
     KNNModelWithTop,
     Popular,
     TopPopularAllCovered,
+    KNNModelBM25
 )
-
+import pandas as pd
 router = APIRouter()
 
 api_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
@@ -40,8 +41,11 @@ models_zoo = {
     "BlendingKNNWithAddFeatures": KNNModelWithTop(
         path_to_reco="data/BlendingKNNWithAddFeatures.csv.gz"
     ),
-    "KNNBM25withAddFeatures": KNNModelWithTop(
-        path_to_reco="data/KNNBM25withAddFeatures.csv.gz"
+    # "KNNBM25withAddFeatures": KNNModelWithTop(
+    #     path_to_reco="data/KNNBM25withAddFeatures.csv.gz"
+    # )
+    "KNNBM25withAddFeatures": KNNModelBM25(
+        path_to_model="data/knn_bm25.pickle"
     )
 }
 
