@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, FastAPI, Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.security.api_key import APIKey, APIKeyHeader, APIKeyQuery
@@ -19,35 +21,42 @@ from .models_zoo import (
     TopPopularAllCovered,
 )
 
+# from .models_zoo import models_zoo
+data_path = Path(__file__).parent.parent.parent/"data"
+
+try:
+    models_zoo = {
+        "model_1": DumpModel(),
+        "TopPopularAllCovered": TopPopularAllCovered(),
+        "modelpopular": Popular(),
+        "UserKnnTfIdfTop": KNNModelWithTop(
+            path_to_reco=str(data_path/"UserKnnTfIdf.csv")
+        ),
+        "ItemKNN": KNNModelWithTop(
+            path_to_reco=str(data_path/"ItemKNN.csv")
+        ),
+        "BlendingKNN": KNNModelWithTop(
+            path_to_reco=str(data_path/"BlendingKNN.csv.gz")
+        ),
+        "BlendingKNNWithAddFeatures": KNNModelWithTop(
+            path_to_reco=str(data_path/"BlendingKNNWithAddFeatures.csv.gz")
+        ),
+        "KNNBM25withAddFeatures": KNNModelBM25(
+            path_to_model=str(data_path/"knn_bm25.pickle")
+        )
+    }
+except FileNotFoundError:
+    models_zoo = {
+        "model_1": DumpModel(),
+        "TopPopularAllCovered": TopPopularAllCovered(),
+        "modelpopular": Popular(),
+    }
+
 router = APIRouter()
 
 api_query = APIKeyQuery(name=config_env["API_KEY_NAME"], auto_error=False)
 api_header = APIKeyHeader(name=config_env["API_KEY_NAME"], auto_error=False)
 token_bearer = HTTPBearer(auto_error=False)
-
-models_zoo = {
-    "model_1": DumpModel(),
-    "TopPopularAllCovered": TopPopularAllCovered(),
-    "modelpopular": Popular(),
-    "UserKnnTfIdfTop": KNNModelWithTop(
-        path_to_reco="data/UserKnnTfIdf.csv"
-    ),
-    "ItemKNN": KNNModelWithTop(
-        path_to_reco="data/ItemKNN.csv"
-    ),
-    "BlendingKNN": KNNModelWithTop(
-        path_to_reco="data/BlendingKNN.csv.gz"
-    ),
-    "BlendingKNNWithAddFeatures": KNNModelWithTop(
-        path_to_reco="data/BlendingKNNWithAddFeatures.csv.gz"
-    ),
-    # "KNNBM25withAddFeatures": KNNModelWithTop(
-    #     path_to_reco="data/KNNBM25withAddFeatures.csv.gz"
-    # )
-    "KNNBM25withAddFeatures": KNNModelBM25(
-        path_to_model="data/knn_bm25.pickle"
-    )
-}
 
 
 async def get_api_key(

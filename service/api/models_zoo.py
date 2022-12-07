@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
+from pathlib import Path
 from typing import Dict, List, Set
 
 import dill
@@ -7,6 +8,8 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 from implicit.nearest_neighbours import ItemItemRecommender
+
+data_path = Path(__file__).parent.parent.parent/"data"
 
 
 class BaseModelZoo(ABC):
