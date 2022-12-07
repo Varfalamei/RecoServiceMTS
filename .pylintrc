@@ -148,6 +148,7 @@ disable=print-statement,
         consider-using-with,
         no-name-in-module,
         duplicate-code,
+        R1705
 
 
 
