@@ -1,15 +1,12 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from pathlib import Path
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Tuple
 
 import dill
 import numpy as np
 import pandas as pd
 import scipy as sp
 from implicit.nearest_neighbours import ItemItemRecommender
-
-data_path = Path(__file__).parent.parent.parent/"data"
 
 
 class BaseModelZoo(ABC):
@@ -53,6 +50,17 @@ class DumpModel(BaseModelZoo):
 
 
 class TopPopularAllCovered(BaseModelZoo):
+    def __init__(
+        self,
+        top_reco: Tuple[int, ...] = tuple([
+            10440, 15297, 9728, 13865, 2657,
+            4151, 3734, 6809, 4740, 4880, 7571,
+            11237, 8636, 14741
+        ])
+    ) -> None:
+        super().__init__()
+        self.top_reco = top_reco
+
     def reco_predict(
         self,
         user_id: int,
@@ -64,15 +72,21 @@ class TopPopularAllCovered(BaseModelZoo):
         :param k_recs: how many recs do you need
         :return: list of recommendation ids
         """
-        reco = [
-                   10440, 15297, 9728, 13865, 2657,
-                   4151, 3734, 6809, 4740, 4880, 7571,
-                   11237, 8636, 14741
-               ][:k_recs]
+        reco = list(self.top_reco)[:k_recs]
         return reco
 
 
 class Popular(BaseModelZoo):
+    def __init__(
+        self,
+        top_reco: Tuple[int, ...] = tuple([
+            10440, 15297, 9728, 13865, 4151,
+            3734, 2657, 4880, 142, 6809
+        ])
+    ) -> None:
+        super().__init__()
+        self.top_reco = top_reco
+
     def reco_predict(
         self,
         user_id: int,
@@ -84,24 +98,26 @@ class Popular(BaseModelZoo):
         :param k_recs: how many recs do you need
         :return: list of recommendation ids
         """
-        reco = [10440, 15297, 9728, 13865, 4151, 3734, 2657, 4880, 142, 6809]
+        reco = list(self.top_reco)[:k_recs]
         return reco
 
 
 class KNNModelWithTop(BaseModelZoo):
     def __init__(
         self,
-        path_to_reco: str = "data/BlendingKNNWithAddFeatures.csv.gz"
-    ):
+        path_to_reco: str = "data/BlendingKNNWithAddFeatures.csv.gz",
+        top_reco: Tuple[int, ...] = tuple([
+            10440, 15297, 9728, 13865, 3734,
+            12192, 4151, 11863, 7793, 7829
+        ]),
+    ) -> None:
         super().__init__()
         self.path_to_reco = path_to_reco
         if self.path_to_reco.endswith('csv.gz'):
             self.data = pd.read_csv(path_to_reco, compression='gzip')
         elif self.path_to_reco.endswith('.csv'):
             self.data = pd.read_csv(path_to_reco)
-        self.top_reco = [
-            10440, 15297, 9728, 13865, 3734, 12192, 4151, 11863, 7793, 7829
-        ]
+        self.top_reco = top_reco
 
     def reco_predict(
         self,
@@ -131,16 +147,18 @@ class KNNModelWithTop(BaseModelZoo):
 class KNNModelBM25(BaseModelZoo):
     def __init__(
         self,
-        path_to_model: str = "data/knn_bm25.pickle"
-    ):
+        path_to_model: str = "data/knn_bm25.pickle",
+        top_reco: Tuple[int, ...] = tuple([
+            10440, 15297, 9728, 13865, 3734,
+            12192, 4151, 11863, 7793, 7829
+        ])
+    ) -> None:
         super().__init__()
 
         with open(path_to_model, 'rb') as f:
             self.model = dill.load(f)
 
-        self.top_reco = [
-            10440, 15297, 9728, 13865, 3734, 12192, 4151, 11863, 7793, 7829
-        ]
+        self.top_reco = top_reco
 
     def reco_predict(
         self,
