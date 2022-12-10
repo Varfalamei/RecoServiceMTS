@@ -14,7 +14,7 @@ class BaseModelZoo(ABC):
         pass
 
     @staticmethod
-    def unique(items: List[int]) -> List[int]:
+    def unique_reco(items: List[int]) -> List[int]:
         seen: Set[int] = set()
         seen_add = seen.add
         return [item for item in items if not (item in seen or seen_add(item))]
@@ -139,7 +139,7 @@ class KNNModelWithTop(BaseModelZoo):
 
         if len(reco) < k_recs:
             reco.extend(self.top_reco)
-            reco = self.unique(reco)[:k_recs]  # Удаляем дубли
+            reco = self.unique_reco(reco)[:k_recs]  # Удаляем дубли
 
         return reco
 
@@ -178,7 +178,7 @@ class KNNModelBM25(BaseModelZoo):
 
         if len(reco) < k_recs:
             reco.extend(self.top_reco)
-            reco = self.unique(reco)[:k_recs]  # Удаляем дубли
+            reco = self.unique_reco(reco)[:k_recs]  # Удаляем дубли
 
         return reco
 
