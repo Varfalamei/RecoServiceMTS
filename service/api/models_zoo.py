@@ -147,7 +147,7 @@ class KNNModelWithTop(BaseModelZoo):
         return reco
 
 
-class KNNModelBM25(BaseModelZoo):
+class OnlineModel(BaseModelZoo):
     def __init__(
         self,
         path_to_model: str = "data/knn_bm25.pickle",
